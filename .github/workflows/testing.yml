@@ -10,11 +10,14 @@ jobs:
         steps:
             - name: Checkout the Git repository
               uses: actions/checkout@v2
+            - name: Setup Python
+              uses: actions/setup-python@v2
+              with:
+                python-version: '3.x'
             - name: Setup Toltec dependencies
               uses: ./.github/actions/setup
             - name: Build packages
-              run: |
-                remote_repo="https://toltec-dev.org/testing" make repo
+              run: make repo FLAGS="--remote-repo https://toltec-dev.org/testing"
             - name: Sync packages with the remote repository
               uses: ./.github/actions/sync-repository
               with:
