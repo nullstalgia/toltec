@@ -55,8 +55,7 @@ $(RECIPES): %:
 	./scripts/package_build.py $(FLAGS) "$(@)"
 
 push: %:
-	ssh root@"$(HOST)" rm -rf ~/.cache/toltec
-	scp -r build/repo root@"$(HOST)":~/.cache/toltec
+	scp -pr build/repo/. root@"$(HOST)":~/.cache/toltec/
 
 format:
 	@echo "==> Checking Bash formatting"
