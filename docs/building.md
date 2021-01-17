@@ -18,7 +18,9 @@ Before running the build, make sure you have all the required dependencies:
 
 * Docker
 * bsdtar
-* tree
+* Python 3.9
+
+You’ll also need to have the required Python modules listed in [requirements.txt](../requirements.txt) available (install them by running `pip install --user -r requirements.txt` or using a [virtual environment](https://docs.python.org/3/tutorial/venv.html)).
 
 To start the build, run `make repo-local`.
 This will be a long process, so you may want to grab a cup of coffee.
