@@ -124,7 +124,7 @@ directory, or [k]eep it (not recommended)?",
         self._fetch_source(adapter, recipe, recipe_dir, src_dir)
         self._prepare(adapter, recipe, src_dir)
         self._build(adapter, recipe, src_dir)
-        self._strip(adapter, src_dir)
+        self._strip(adapter, recipe, src_dir)
 
         for package_name in (
             packages_names
@@ -159,24 +159,21 @@ recipe '{recipe.name}'"
         """Fetch and extract all source files required to build a recipe."""
         adapter.info("Fetching source files")
 
-        for source, checksum in recipe.sources.items():
-            source = source or ""
-            checksum = checksum or ""
-
-            filename = os.path.basename(source)
+        for source in recipe.sources:
+            filename = os.path.basename(source.url)
             local_path = os.path.join(src_dir, filename)
 
-            if self.URL_REGEX.match(source) is None:
+            if self.URL_REGEX.match(source.url) is None:
                 # Get source file from the recipe’s directory
-                shutil.copy2(os.path.join(recipe_dir, source), local_path)
+                shutil.copy2(os.path.join(recipe_dir, source.url), local_path)
             else:
                 # Fetch source file from the network
-                req = requests.get(source)
+                req = requests.get(source.url)
 
                 if req.status_code != 200:
                     raise BuildError(
                         f"Unexpected status code while fetching \
-    source file '{source}', got {req.status_code}"
+source file '{source.url}', got {req.status_code}"
                     )
 
                 with open(local_path, "wb") as local:
@@ -184,11 +181,16 @@ recipe '{recipe.name}'"
                         local.write(chunk)
 
             # Verify checksum
-            if checksum != "SKIP" and util.file_sha256(local_path) != checksum:
-                raise BuildError(f"Invalid checksum for source file {source}")
+            if (
+                source.checksum != "SKIP"
+                and util.file_sha256(local_path) != source.checksum
+            ):
+                raise BuildError(
+                    f"Invalid checksum for source file {source.url}"
+                )
 
             # Automatically extract source archives
-            if filename not in recipe.noextract:
+            if not source.noextract:
                 util.auto_extract(local_path, src_dir)
 
     def _prepare(  # pylint: disable=no-self-use
@@ -243,8 +245,14 @@ recipe '{recipe.name}'"
         for line in logs:
             adapter.debug(line)
 
-    def _strip(self, adapter: BuildContextAdapter, src_dir: str) -> None:
+    def _strip(
+        self, adapter: BuildContextAdapter, recipe: Recipe, src_dir: str
+    ) -> None:
         """Strip all debugging symbols from binaries."""
+        if "nostrip" in recipe.flags:
+            adapter.info("Not stripping binaries (nostrip flag set)")
+            return
+
         adapter.info("Stripping binaries")
         mount_src = "/src"
 

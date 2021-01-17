@@ -246,6 +246,22 @@ Each entry can either be a local path relative to the recipe file or a full URL 
 Archive files whose names end in `.zip`, `.tar.gz`, `.tar.xz`, or `.tar.bz` will be automatically extracted in place, with all container directories stripped.
 You can disable this behavior by adding the archive name to the `noextract` array.
 
+#### `flags`
+
+<table>
+    <tr>
+        <th>Required?</th>
+        <td>No, defaults to <code>()</code></th>
+    </tr>
+    <tr>
+        <th>Type</th>
+        <td>Array of strings</td>
+    </tr>
+</table>
+
+Set of flags that affect the build process.
+Currently, the only available flag is `nostrip`, which disables the automatic removal of unneeded symbols from binaries.
+
 #### `noextract`
 
 <table>

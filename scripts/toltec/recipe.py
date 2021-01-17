@@ -8,6 +8,7 @@ which contains the instructions necessary to build one or more related
 packages (in the latter case, it is called a split package).
 """
 
+from dataclasses import dataclass
 from itertools import product
 from typing import Optional
 import os
@@ -18,6 +19,15 @@ from . import bash, version
 
 class RecipeError(Exception):
     """Raised when a recipe contains an error."""
+
+
+@dataclass
+class Source:
+    """Source item needed to build a recipe."""
+
+    url: str
+    checksum: str
+    noextract: bool
 
 
 class Recipe:  # pylint:disable=too-many-instance-attributes,disable=too-few-public-methods
@@ -50,9 +60,10 @@ valid ISO-8601 date"
 
         self.maintainer = _check_field_string(variables, "maintainer")
         self.image = _check_field_string(variables, "image", "")
+        self.flags = _check_field_indexed(variables, "flags", [])
         sources = _check_field_indexed(variables, "source", [])
-        noextract = _check_field_indexed(variables, "noextract", [])
         sha256sums = _check_field_indexed(variables, "sha256sums", [])
+        noextract = set(_check_field_indexed(variables, "noextract", []))
 
         if len(sources) != len(sha256sums):
             raise RecipeError(
@@ -61,8 +72,16 @@ and checksums, got {len(sources)} source(s) and \
 {len(sha256sums)} checksum(s)"
             )
 
-        self.sources = dict(zip(sources, sha256sums))
-        self.noextract = set(noextract)
+        self.sources = []
+
+        for source, checksum in zip(sources, sha256sums):
+            self.sources.append(
+                Source(
+                    url=source or "",
+                    checksum=checksum or "SKIP",
+                    noextract=source in noextract,
+                )
+            )
 
         # Parse recipe build hooks
         self.actions = {}
