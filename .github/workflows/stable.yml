@@ -17,14 +17,14 @@ jobs:
             - name: Setup Toltec dependencies
               uses: ./.github/actions/setup
             - name: Build packages
-              run: make repo FLAGS="--remote-repo https://toltec-dev.org/stable"
+              run: make repo FLAGS='--remote-repo ${{ secrets.REMOTE_HTTP }}/stable'
             - name: Sync packages with the remote repository
               uses: ./.github/actions/sync-repository
               with:
                 local-path: build/repo/
                 ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
                 ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-                remote-path: ${{ secrets.REMOTE }}:/srv/toltec/stable
+                remote-path: ${{ secrets.REMOTE_SSH }}:/srv/toltec/stable
             - name: Send notification to Discord
               continue-on-error: true
               uses: ./.github/actions/discord-send
