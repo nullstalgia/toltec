@@ -18,7 +18,7 @@ Before running the build, make sure you have all the required dependencies:
 
 * Docker
 * bsdtar
-* Python 3.9
+* Python ⩾ 3.8
 
 You’ll also need to have the required Python modules listed in [requirements.txt](../requirements.txt) available (install them by running `pip install --user -r requirements.txt` or using a [virtual environment](https://docs.python.org/3/tutorial/venv.html)).
 

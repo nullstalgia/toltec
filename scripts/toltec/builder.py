@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: MIT
 """Build recipes and create packages."""
 
-from collections.abc import Iterable
 import shutil
-from typing import Optional
+from typing import Iterable, Optional
 import re
 import os
 import glob
@@ -306,7 +305,7 @@ source file '{source.url}', got {req.status_code}"
         adapter.debug("Resulting tree:")
 
         for filename in glob.iglob(pkg_dir + "/**/*", recursive=True):
-            adapter.debug(" - %s", filename.removeprefix(pkg_dir))
+            adapter.debug(" - /%s", os.path.relpath(filename, pkg_dir))
 
     def _archive(
         self, adapter: BuildContextAdapter, package: Package, pkg_dir: str
