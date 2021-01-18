@@ -116,10 +116,10 @@ directory, or [k]eep it (not recommended)?",
                 os.mkdir(build_dir)
 
         src_dir = os.path.join(build_dir, "src")
-        os.mkdir(src_dir)
+        os.makedirs(src_dir, exist_ok=True)
 
         base_pkg_dir = os.path.join(build_dir, "pkg")
-        os.mkdir(base_pkg_dir)
+        os.makedirs(base_pkg_dir, exist_ok=True)
 
         self._fetch_source(adapter, recipe, recipe_dir, src_dir)
         self._prepare(adapter, recipe, src_dir)
@@ -142,7 +142,7 @@ recipe '{recipe.name}'"
             context["package"] = package_name
 
             pkg_dir = os.path.join(base_pkg_dir, package_name)
-            os.mkdir(pkg_dir)
+            os.makedirs(pkg_dir, exist_ok=True)
 
             self._package(adapter, package, src_dir, pkg_dir)
             self._archive(adapter, package, pkg_dir)
