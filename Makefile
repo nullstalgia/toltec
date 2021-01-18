@@ -55,7 +55,10 @@ $(RECIPES): %:
 	./scripts/package_build.py $(FLAGS) "$(@)"
 
 push: %:
-	scp -pr build/repo/. root@"$(HOST)":~/.cache/toltec/
+	rsync --rsync-path /opt/bin/rsync \
+	      --archive --verbose --compress --delete \
+	      build/repo/ \
+	      root@"$(HOST)":~/.cache/toltec/
 
 format:
 	@echo "==> Checking Bash formatting"
